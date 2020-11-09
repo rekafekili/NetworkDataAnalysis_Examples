@@ -9,6 +9,6 @@ public class IctTalkClient {
     private static final int SERVER_PORT = 3000;
 
     public static void main(String[] args) {
-
+        LoginView.launch(args);
     }
 }
