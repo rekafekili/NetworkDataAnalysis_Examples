@@ -19,6 +19,8 @@ import javafx.stage.Stage;
 
 import java.io.BufferedReader;
 
+// TODO: 게시판에 올려진 예제를 JavaFx 코드로 바꾸기
+// TODO: JSON 통신 예제 만들기
 public class IctTalkClient extends Application implements ServerListener {
     private UdpClientManager mUdpClientManager;
     private static final String SERVER_IP = "220.68.65.43";
