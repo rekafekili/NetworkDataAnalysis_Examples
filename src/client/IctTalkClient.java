@@ -1,8 +1,6 @@
 package client;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -13,6 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -20,18 +19,20 @@ import javafx.stage.Stage;
 
 import java.io.BufferedReader;
 
-// Timer 설정해서 반응이 안오면 에러 처리!
 public class IctTalkClient extends Application implements ServerListener {
-    private String message;
-    private BufferedReader bufferedReader;
-    private UdpClientManager udpClientManager;
+    private UdpClientManager mUdpClientManager;
     private static final String SERVER_IP = "220.68.65.43";
     private static final int SERVER_PORT = 3000;
+    private Stage mSignUpStage;
+    private Text mActionText;
+    private Stage mPrimaryStage;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        udpClientManager = new UdpClientManager(SERVER_IP, SERVER_PORT);
-        primaryStage.setTitle("ICT Talk");
+        mUdpClientManager = new UdpClientManager(SERVER_IP, SERVER_PORT);
+        mUdpClientManager.setServerListener(this);
+        mPrimaryStage = primaryStage;
+        mPrimaryStage.setTitle("ICT Talk");
 
         GridPane loginGrid = new GridPane();
         loginGrid.setAlignment(Pos.CENTER);
@@ -62,9 +63,7 @@ public class IctTalkClient extends Application implements ServerListener {
         // 로그인 버튼 추가
         Button signInButton = new Button("Sign In");
         signInButton.setOnAction(event -> {
-            StackPane stackPane = new StackPane();
-            Scene scene1 = new Scene(stackPane, 500, 400);
-            primaryStage.setScene(scene1);
+            mUdpClientManager.sendMessage("signin/" + userIDTextField.getText() + "," + userPasswordField.getText());
         });
 
         Button signUpButton = new Button("Sign Up");
@@ -80,21 +79,24 @@ public class IctTalkClient extends Application implements ServerListener {
         hBox.getChildren().add(signInButton);
         loginGrid.add(hBox, 1, 4);
 
+        Text actionText = new Text("HI!");
+        loginGrid.add(actionText, 1, 5);
+
         primaryStage.setResizable(false);
         primaryStage.show();
     }
 
     private Stage createRegisterStage() {
-        Stage signUpStage = new Stage();
-        signUpStage.setTitle("Sign Up to ICT Talk");
-        signUpStage.setResizable(false);
+        mSignUpStage = new Stage();
+        mSignUpStage.setTitle("Sign Up to ICT Talk");
+        mSignUpStage.setResizable(false);
 
         GridPane signUpGrid = new GridPane();
         signUpGrid.setAlignment(Pos.CENTER);
         signUpGrid.setHgap(10);
         signUpGrid.setVgap(20);
         Scene signUpScene = new Scene(signUpGrid, 300, 300);
-        signUpStage.setScene(signUpScene);
+        mSignUpStage.setScene(signUpScene);
 
         Text welcomeText = new Text("Welcome to ICT Talk!");
         welcomeText.setFont(Font.font("Tahoma", FontWeight.BOLD, 18));
@@ -125,14 +127,17 @@ public class IctTalkClient extends Application implements ServerListener {
             String userId = idTextField.getText();
             String userPassword = passwordTextField.getText();
 
-            udpClientManager.sendMessage("register/" + "," + userId + "," + userPassword);
+            mUdpClientManager.sendMessage("register/" + userId + "," + userPassword);
         });
 
         HBox hbox = new HBox(10);
         hbox.setAlignment(Pos.BOTTOM_RIGHT);
         hbox.getChildren().add(registerButton);
         signUpGrid.add(hbox, 1, 3);
-        return signUpStage;
+
+        mActionText = new Text("Welcome!");
+        signUpGrid.add(mActionText, 1, 5);
+        return mSignUpStage;
     }
 
     public static void main(String[] args) {
@@ -140,7 +145,27 @@ public class IctTalkClient extends Application implements ServerListener {
     }
 
     @Override
-    public void getServerMessage(String message) {
+    public void getServerMessage(String serverMessage) {
+        System.out.println("Server : " + serverMessage);
+        String result = serverMessage.split("/")[0];
+        String data = serverMessage.split("/")[1];
 
+        switch(result) {
+            case "OK":
+                mSignUpStage.close();
+                break;
+            case "ERROR":
+                mActionText.setFill(Color.FIREBRICK);
+                mActionText.setText(data);
+                break;
+            case "SOK":
+                StackPane stackPane = new StackPane();
+                Text text = new Text("Your Imagine!");
+                stackPane.getChildren().add(text);
+
+                Scene scene1 = new Scene(stackPane, 500, 400);
+                mPrimaryStage.setScene(scene1);
+                break;
+        }
     }
 }

@@ -7,7 +7,7 @@ public class UdpClientManager {
     private final DatagramSocket mDatagramSocket;
     private InetAddress mServerIp;
     private int mServerPort;
-    private ServerListener serverListener;
+    private ServerListener mServerListener;
 
     public UdpClientManager(String ip, int port) throws UnknownHostException, SocketException {
         mServerIp = InetAddress.getByName(ip);
@@ -16,7 +16,7 @@ public class UdpClientManager {
     }
 
     public void setServerListener(ServerListener listener) {
-        serverListener = listener;
+        mServerListener = listener;
     }
 
     public boolean sendMessage(String message) {
@@ -30,10 +30,7 @@ public class UdpClientManager {
 
             mDatagramSocket.receive(datagramPacket);
             String receivedMessage = new String(datagramPacket.getData());
-            String type = receivedMessage.split("/")[0];
-            String serverMessage = receivedMessage.split("/")[1];
-
-
+            mServerListener.getServerMessage(receivedMessage);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
