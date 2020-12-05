@@ -114,6 +114,12 @@ public class Smartphone implements Runnable {
             case "humidity":
                 labelH.setText(kv[1] + "%");
                 break;
+            case "auto":
+                // 주기적으로 온습도 정보를 받는 경우
+                String splitTemp = kv[1].split(",")[0];
+                String splitHumidity = kv[1].split(",")[1];
+                labelT.setText(splitTemp + "℃");
+                labelH.setText(splitHumidity + "%");
         }
     }
 

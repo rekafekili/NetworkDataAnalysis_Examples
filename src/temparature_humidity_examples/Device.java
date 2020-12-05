@@ -61,11 +61,12 @@ public class Device extends JFrame implements Runnable {
                 TimerTask sendTimerTask = new TimerTask() {
                     @Override
                     public void run() {
-
+                        String value = temp.getText() + "," + humidity.getText();
+                        sendMsg("auto=" + value);
                     }
                 };
 
-                sendTimer.schedule(sendTimerTask, periodValue, periodValue);
+                sendTimer.schedule(sendTimerTask, 0, periodValue);
             }
         });
 
