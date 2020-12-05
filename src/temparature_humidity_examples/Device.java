@@ -61,7 +61,7 @@ public class Device extends JFrame implements Runnable {
                 TimerTask sendTimerTask = new TimerTask() {
                     @Override
                     public void run() {
-                        sendMsg();
+
                     }
                 };
 
